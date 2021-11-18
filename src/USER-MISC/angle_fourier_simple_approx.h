@@ -27,7 +27,6 @@ AngleStyle(fourier/simple/approx,AngleFourierSimpleApprox);
 
 #include "angle_fourier_simple.h"
 #include "math_const.h"
-#include <cassert>
 
 namespace LAMMPS_NS {
 

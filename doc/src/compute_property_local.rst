@@ -18,7 +18,7 @@ Syntax
 
        possible attributes = natom1 natom2 ntype1 ntype2
                              patom1 patom2 ptype1 ptype2
-                             batom1 batom2 btype
+                             batom1 batom2 btype  bid
                              aatom1 aatom2 aatom3 atype
                              datom1 datom2 datom3 datom4 dtype
                              iatom1 iatom2 iatom3 iatom4 itype
@@ -31,6 +31,7 @@ Syntax
           ptype1, ptype2 = type of 2 atoms in each pair (within force cutoff)
           batom1, batom2 = IDs of 2 atoms in each bond
           btype = bond type of each bond
+          bid = bond id of each bond
           aatom1, aatom2, aatom3 = IDs of 3 atoms in each angle
           atype = angle type of each angle
           datom1, datom2, datom3, datom4 = IDs of 4 atoms in each dihedral
@@ -134,7 +135,8 @@ The *batom1* and *batom2* attributes refer to the atom IDs of the 2
 atoms in each :doc:`bond <bond_style>`.  The *btype* attribute refers to
 the type of the bond, from 1 to Nbtypes = # of bond types.  The number
 of bond types is defined in the data file read by the
-:doc:`read_data <read_data>` command.
+:doc:`read_data <read_data>` command.  The *bid* attribute refers to 
+the id of the bond, from 1 to Nbonds = # of bonds.  
 
 The attributes that start with "a", "d", "i", refer to similar values
 for :doc:`angles <angle_style>`, :doc:`dihedrals <dihedral_style>`, and

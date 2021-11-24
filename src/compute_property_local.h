@@ -64,6 +64,7 @@ class ComputePropertyLocal : public Compute {
   void pack_batom1(int);
   void pack_batom2(int);
   void pack_btype(int);
+  void pack_bid(int);
 
   void pack_aatom1(int);
   void pack_aatom2(int);

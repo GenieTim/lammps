@@ -110,6 +110,11 @@ ComputePropertyLocal::ComputePropertyLocal(LAMMPS *lmp, int narg, char **arg) :
       if (kindflag != NONE && kindflag != BOND)
         error->all(FLERR, "Compute property/local cannot use these inputs together");
       kindflag = BOND;
+    } else if (strcmp(arg[iarg], "bid") == 0) {
+      pack_choice[i] = &ComputePropertyLocal::pack_bid;
+      if (kindflag != NONE && kindflag != BOND)
+        error->all(FLERR, "Compute property/local cannot use these inputs together");
+      kindflag = BOND;
 
     } else if (strcmp(arg[iarg], "aatom1") == 0) {
       pack_choice[i] = &ComputePropertyLocal::pack_aatom1;
@@ -749,6 +754,21 @@ void ComputePropertyLocal::pack_btype(int n)
 {
   int i, j;
   int **bond_type = atom->bond_type;
+
+  for (int m = 0; m < ncount; m++) {
+    i = indices[m][0];
+    j = indices[m][1];
+    buf[n] = bond_type[i][j];
+    n += nvalues;
+  }
+}
+
+/* ---------------------------------------------------------------------- */
+
+void ComputePropertyLocal::pack_bid(int n)
+{
+  int i, j;
+  int **bond_type = atom->bond_atom;
 
   for (int m = 0; m < ncount; m++) {
     i = indices[m][0];

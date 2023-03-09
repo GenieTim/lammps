@@ -217,8 +217,10 @@ void FixBrownianBase::init()
   g1 = force->ftm2v;
   if (noise_flag == 0) {
     g2 = 0.0;
-  } else {
+  } else if (gaussian_noise_flag == 1) {
     g2 = sqrt(2 * force->boltz / dt / force->mvv2e);
+  } else {
+    g2 = sqrt(24 * force->boltz / dt / force->mvv2e);
   }
 }
 

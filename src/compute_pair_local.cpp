@@ -30,7 +30,7 @@ using namespace LAMMPS_NS;
 
 #define DELTA 10000
 
-enum { DIST, ENG, FORCE, FX, FY, FZ, PN, DX, DY, DZ };
+enum { DIST, ENG, FORCE, FX, FY, FZ, VIRX, VIRY, VIRZ, PN, DX, DY, DZ };
 enum { TYPE, RADIUS };
 
 /* ---------------------------------------------------------------------- */
@@ -60,6 +60,12 @@ ComputePairLocal::ComputePairLocal(LAMMPS *lmp, int narg, char **arg) :
       pstyle[nvalues++] = FY;
     else if (strcmp(arg[iarg], "fz") == 0)
       pstyle[nvalues++] = FZ;
+    else if (strcmp(arg[iarg], "virx") == 0)
+      pstyle[nvalues++] = VIRX;
+    else if (strcmp(arg[iarg], "viry") == 0)
+      pstyle[nvalues++] = VIRY;
+    else if (strcmp(arg[iarg], "virz") == 0)
+      pstyle[nvalues++] = VIRZ;
     else if (strcmp(arg[iarg], "dx") == 0)
       pstyle[nvalues++] = DX;
     else if (strcmp(arg[iarg], "dy") == 0)
@@ -310,6 +316,15 @@ int ComputePairLocal::compute_pairs(int flag)
               break;
             case FZ:
               ptr[n] = delz * fpair;
+              break;
+            case VIRX:
+              ptr[n] = delx * delx * fpair;
+              break;
+            case VIRY:
+              ptr[n] = dely * dely * fpair;
+              break;
+            case VIRZ:
+              ptr[n] = delz * delz * fpair;
               break;
             case PN:
               ptr[n] = pair->svector[pindex[n]];

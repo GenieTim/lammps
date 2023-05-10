@@ -186,7 +186,7 @@ Atom::Atom(LAMMPS *_lmp) : Pointers(_lmp)
   // MESO package
 
   cc = cc_flux = nullptr;
-  edpd_temp = edpd_flux = edpd_cv = nullptr;
+  edpd_temp = edpd_flux = edpd_cv = vest_temp = nullptr;
 
   // MACHDYN package
 
@@ -1944,16 +1944,17 @@ void Atom::set_mass(const char *file, int line, int /*narg*/, char **arg)
     error->all(file,line, "Cannot set per-type atom mass for atom style {}", atom_style);
 
   char *typestr = utils::expand_type(file, line, arg[0], Atom::ATOM, lmp);
-  if (typestr) arg[0] = typestr;
+  const std::string str = typestr ? typestr : arg[0];
+  delete[] typestr;
 
   int lo, hi;
-  utils::bounds(file, line, arg[0], 1, ntypes, lo, hi, error);
+  utils::bounds(file, line, str, 1, ntypes, lo, hi, error);
   if ((lo < 1) || (hi > ntypes))
-    error->all(file, line, "Invalid atom type {} for atom mass", arg[0]);
+    error->all(file, line, "Invalid atom type {} for atom mass", str);
 
   const double value = utils::numeric(FLERR, arg[1], false, lmp);
   if (value <= 0.0)
-    error->all(file, line, "Invalid atom mass value {} for type {}", value, arg[0]);
+    error->all(file, line, "Invalid atom mass value {} for type {}", value, str);
 
   for (int itype = lo; itype <= hi; itype++) {
     mass[itype] = value;
@@ -2270,6 +2271,10 @@ void Atom::sort()
 
   for (i = 0; i < nbins; i++) binhead[i] = -1;
 
+  // for triclinic, atoms must be in box coords (not lamda) to match bbox
+
+  if (domain->triclinic) domain->lamda2x(nlocal);
+
   for (i = nlocal-1; i >= 0; i--) {
     ix = static_cast<int> ((x[i][0]-bboxlo[0])*bininvx);
     iy = static_cast<int> ((x[i][1]-bboxlo[1])*bininvy);
@@ -2284,6 +2289,10 @@ void Atom::sort()
     next[i] = binhead[ibin];
     binhead[ibin] = i;
   }
+
+  // convert back to lamda coords
+
+  if (domain->triclinic) domain->x2lamda(nlocal);
 
   // permute = desired permutation of atoms
   // permute[I] = J means Ith new atom will be Jth old atom

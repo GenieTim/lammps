@@ -24,7 +24,6 @@
 #include "error.h"
 #include "fix_deform.h"
 #include "force.h"
-#include "group.h"
 #include "irregular.h"
 #include "kspace.h"
 #include "modify.h"
@@ -37,8 +36,8 @@
 using namespace LAMMPS_NS;
 using namespace FixConst;
 
-#define DELTAFLIP 0.1
-#define TILTMAX 1.5
+static constexpr double DELTAFLIP = 0.1;
+static constexpr double TILTMAX = 1.5;
 
 enum { NONE, XYZ, XY, YZ, XZ };
 enum { ISO, ANISO, TRICLINIC };
@@ -376,9 +375,6 @@ FixPressLangevin::FixPressLangevin(LAMMPS *lmp, int narg, char **arg) :
         (1.0 + p_alpha[i] * update->dt / 2.0 / p_mass[i]);
     gjfb[i] = 1. / (1.0 + p_alpha[i] * update->dt / 2.0 / p_mass[i]);
   }
-
-  nrigid = 0;
-  rfix = nullptr;
 }
 
 /* ---------------------------------------------------------------------- */
@@ -386,7 +382,6 @@ FixPressLangevin::FixPressLangevin(LAMMPS *lmp, int narg, char **arg) :
 FixPressLangevin::~FixPressLangevin()
 {
   delete random;
-  delete[] rfix;
   delete irregular;
 
   // delete temperature and pressure if fix created them
@@ -437,20 +432,10 @@ void FixPressLangevin::init()
     kspace_flag = 0;
 
   // detect if any rigid fixes exist so rigid bodies move when box is remapped
-  // rfix[] = indices to each fix rigid
 
-  delete[] rfix;
-  nrigid = 0;
-  rfix = nullptr;
-
-  for (const auto &ifix : modify->get_fix_list())
-    if (ifix->rigid_flag) nrigid++;
-  if (nrigid > 0) {
-    rfix = new Fix *[nrigid];
-    nrigid = 0;
-    for (auto &ifix : modify->get_fix_list())
-      if (ifix->rigid_flag) rfix[nrigid++] = ifix;
-  }
+  rfix.clear();
+  for (auto &ifix : modify->get_fix_list())
+    if (ifix->rigid_flag) rfix.push_back(ifix);
 
   // Nullifies piston derivatives and forces so that it is not integrated at
   // the start of a second run.
@@ -680,8 +665,7 @@ void FixPressLangevin::remap()
       if (mask[i] & groupbit) domain->x2lamda(x[i], x[i]);
   }
 
-  if (nrigid)
-    for (i = 0; i < nrigid; i++) rfix[i]->deform(0);
+  for (auto &ifix : rfix) ifix->deform(0);
 
   // reset global and local box to new size/shape
 
@@ -719,8 +703,7 @@ void FixPressLangevin::remap()
       if (mask[i] & groupbit) domain->lamda2x(x[i], x[i]);
   }
 
-  if (nrigid)
-    for (i = 0; i < nrigid; i++) rfix[i]->deform(1);
+  for (auto &ifix : rfix) ifix->deform(1);
 }
 
 /* ----------------------------------------------------------------------

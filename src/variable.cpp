@@ -1654,20 +1654,21 @@ double Variable::evaluate(char *str, Tree **tree, int ivar)
           // c_ID[i] = vector from global array
 
           } else if (lowercase && nbracket == 1) {
-
             if (!compute->array_flag)
               print_var_error(FLERR,"Mismatched compute in variable formula",ivar);
-            if (compute->size_array_rows == 0)
-              print_var_error(FLERR,"Variable formula compute array is zero length",ivar);
-            if (index1 > compute->size_array_cols)
-              print_var_error(FLERR,"Variable formula compute array is accessed out-of-range",ivar,0);
             if (!compute->is_initialized())
               print_var_error(FLERR,"Variable formula compute cannot be invoked before "
                               "initialization by a run",ivar);
+
             if (!(compute->invoked_flag & Compute::INVOKED_ARRAY)) {
               compute->compute_array();
               compute->invoked_flag |= Compute::INVOKED_ARRAY;
             }
+
+            if (compute->size_array_rows == 0)
+              print_var_error(FLERR,"Variable formula compute array is zero length",ivar);
+            if (index1 > compute->size_array_cols)
+              print_var_error(FLERR,"Variable formula compute array is accessed out-of-range",ivar,0);
 
             auto newtree = new Tree();
             newtree->type = VECTORARRAY;

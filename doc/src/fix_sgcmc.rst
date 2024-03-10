@@ -6,7 +6,7 @@ fix sgcmc command
 Syntax
 """"""
 
-.. parsed-literal::
+.. code-block:: LAMMPS
 
    fix ID group-ID sgcmc every_nsteps swap_fraction temperature deltamu ...
 
@@ -154,6 +154,9 @@ Restrictions
 This fix is part of the MC package. It is only enabled if LAMMPS was
 built with that package.  See the :doc:`Build package <Build_package>`
 page for more info.
+
+This fix style requires an :doc:`atom style <atom_style>` with per atom
+type masses.
 
 At present the fix provides optimized subroutines for EAM type
 potentials (see above) that calculate potential energy changes due to

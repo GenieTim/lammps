@@ -14,11 +14,11 @@
 #include "compute_count_type.h"
 
 #include "atom.h"
-#include "domain.h"
 #include "error.h"
 #include "force.h"
-#include "group.h"
 #include "update.h"
+
+#include <cstring>
 
 using namespace LAMMPS_NS;
 
@@ -159,6 +159,8 @@ void ComputeCountType::compute_vector()
     nvec = count_dihedrals();
   else if (mode == IMPROPER)
     nvec = count_impropers();
+  else
+    nvec = 0;
 
   // sum across procs as bigint, then convert to double
   // correct for multiple counting if newton_bond off

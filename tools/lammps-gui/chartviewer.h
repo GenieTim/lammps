@@ -20,6 +20,8 @@
 #include <QWidget>
 
 class QAction;
+class QCloseEvent;
+class QEvent;
 class QMenuBar;
 class QMenu;
 namespace QtCharts {
@@ -50,6 +52,7 @@ private slots:
     void saveAs();
     void exportDat();
     void exportCsv();
+    void exportYaml();
 
     void change_chart(int index);
 
@@ -61,7 +64,7 @@ private:
     QMenuBar *menu;
     QMenu *file;
     QComboBox *columns;
-    QAction *saveAsAct, *exportCsvAct, *exportDatAct;
+    QAction *saveAsAct, *exportCsvAct, *exportDatAct, *exportYamlAct;
     QAction *closeAct, *stopAct, *quitAct;
 
     QString filename;
@@ -70,10 +73,10 @@ private:
 
 /* -------------------------------------------------------------------- */
 
-#include <QChart>
 #include <QChartView>
 #include <QLineSeries>
 #include <QValueAxis>
+class QChart;
 
 namespace QtCharts {
 class ChartViewer : public QChartView {
@@ -87,7 +90,7 @@ public:
 
     int get_index() const { return index; };
     int get_count() const { return series->count(); }
-    const char *get_title() const { return series->name().toLocal8Bit(); }
+    QString get_title() const { return series->name(); }
     double get_step(int index) const { return (index < 0) ? 0.0 : series->at(index).x(); }
     double get_data(int index) const { return (index < 0) ? 0.0 : series->at(index).y(); }
 

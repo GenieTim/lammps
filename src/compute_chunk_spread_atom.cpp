@@ -262,6 +262,12 @@ void ComputeChunkSpreadAtom::compute_peratom()
           if (!(mask[i] & groupbit)) continue;
           index = ichunk[i]-1;
           if (index < 0 || index >= nchunk) continue;
+          if (icol >= compute->size_array_cols) {
+            error->all(FLERR, "Compute {} has only has {} columns, {} requested", val.id, compute->size_array_cols, icol);
+          }
+          if (index >= compute->size_array_rows) {
+            error->all(FLERR, "Compute {} has only has {} rows, {} requested", val.id, compute->size_array_rows, index);
+          }
           *ptr = carray[index][icol];
         }
       }
